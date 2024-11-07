@@ -6,10 +6,17 @@ function SurveyScreen() {
   const dispatch = useDispatch();
   const { questions, currentQuestion, answers } = useSelector((state) => state.survey);
   const question = questions[currentQuestion];
+
+
   const handleAnswer = (value) => {
     dispatch(answerQuestion({ questionId: question.id, answer: value }));
   };
 
+  const handlePrevious = () => {
+    if (currentQuestion > 0) {
+      dispatch(prevQuestion());
+    }
+  };
   const handleNext = () => {
     if (currentQuestion === questions.length - 1) {
       dispatch(completeSurvey());
@@ -34,7 +41,7 @@ function SurveyScreen() {
               className={`px-4 py-2 rounded-full font-semibold ${
                 answers[question.id] === index + 1
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-200 text-gray-800 hover:bg-blue-100'
+                  : 'bg-gray-300 text-gray-800 hover:bg-blue-100'
               }`}
             >
               {index + 1}
@@ -51,7 +58,7 @@ function SurveyScreen() {
 
       <div className="flex justify-between mt-6">
         <button
-          onClick={() => dispatch(prevQuestion())}
+          onClick={handlePrevious}
           disabled={currentQuestion === 0}
           className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400"
         >
