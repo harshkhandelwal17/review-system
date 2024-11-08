@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { answerQuestion, nextQuestion, prevQuestion, completeSurvey } from '../redux/surveySlice';
 
@@ -6,10 +6,11 @@ function SurveyScreen() {
   const dispatch = useDispatch();
   const { questions, currentQuestion, answers } = useSelector((state) => state.survey);
   const question = questions[currentQuestion];
-
+  const [error, setError] = useState('');
 
   const handleAnswer = (value) => {
     dispatch(answerQuestion({ questionId: question.id, answer: value }));
+    if (error) setError(''); 
   };
 
   const handlePrevious = () => {
@@ -17,7 +18,13 @@ function SurveyScreen() {
       dispatch(prevQuestion());
     }
   };
+
   const handleNext = () => {
+    if (question.type === 'text' && !answers[question.id]) {
+      setError('This question is required.');
+      return;
+    }
+
     if (currentQuestion === questions.length - 1) {
       dispatch(completeSurvey());
     } else {
@@ -49,11 +56,14 @@ function SurveyScreen() {
           ))}
         </div>
       ) : (
-        <textarea
-          value={answers[question.id] || ''} required
-          onChange={(e) => handleAnswer(e.target.value)}
-          className="border rounded p-2 w-full h-24 mb-4"
-        />
+        <div>
+          <textarea
+            value={answers[question.id] || ''}
+            onChange={(e) => handleAnswer(e.target.value)}
+            className="border rounded p-2 w-full h-24 mb-4"
+          />
+          {error && <p className="text-red-500">{error}</p>}
+        </div>
       )}
 
       <div className="flex justify-between mt-6">
